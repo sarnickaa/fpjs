@@ -17,6 +17,9 @@ const initModel = 0
 //model = the number that will change
 // pure functions MUST have an input paramater and return a value based on that param
 function view(dispatch, model) {
+  //view function takes dispatch function as a param to update Counter
+  //dispatch is defined within the app function
+  //because view is called from within app function - it will have access to whatever is defined within app() scope i.e. dispatch()
   // return div({ className: ''}, []) 1st param object literal for CSS classes (not mandatory), next param = tags or array of tags to create
   return div([
     div({
@@ -28,7 +31,7 @@ function view(dispatch, model) {
       // makes use of currying
       onclick: () => dispatch('plus') }, '+'),
     button({ className: 'pv1 ph2',
-      onclick: () => dispatch('minus') }, '-')
+      onclick: dispatch.bind(null, 'minus') }, '-')
   ])
 }
 //onclick = an event listener on the DOM - with an event handler function passed to handle the event
