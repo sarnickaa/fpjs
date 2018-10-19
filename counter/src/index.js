@@ -1,8 +1,10 @@
 //to start server - npm 'command from package.json: scripts'
 //npm start will run webpack-dev-server --open (--open open default browser)
 
-import h from 'hyperscript'
+// import h from 'hyperscript'
 import hh from 'hyperscript-helpers'
+import { h, diff, patch } from 'virtual-dom'
+import createElement from 'virtual-dom/create-element'
 
 const {
   div,
@@ -29,20 +31,26 @@ function view(dispatch, model) {
       // onclick: dispatch() - would not work as dispatch() is scoped within app function
       // fixed by passing dispatch as first param to VIEW function
       // makes use of currying
-      onclick: () => dispatch('plus') }, '+'),
+      onclick: () => dispatch(MSGS.ADD) }, '+'),
     button({ className: 'pv1 ph2',
-      onclick: dispatch.bind(null, 'minus') }, '-')
+      onclick: dispatch.bind(null, MSGS.MINUS) }, '-')
+      //OOP approach to passing params i.e. requires an object as the 'this' context
   ])
 }
 //onclick = an event listener on the DOM - with an event handler function passed to handle the event
+
+const MSGS ={
+  ADD: 'ADD',
+  MINUS: 'MINUS'
+}
 
 //updating function to increase/decrease number
 // msg = an indicaton of whether + or - was pressed i.e. a string
 function update(msg, model) {
   switch (msg) {
-    case 'plus':
+    case MSGS.ADD:
       return model + 1;
-    case 'minus':
+    case MSGS.MINUS:
       return model - 1;
     default:
       return model;
@@ -53,8 +61,10 @@ function update(msg, model) {
 function app(initModel, update, view, node) {
   let model = initModel // holds state of the app - allows reassignment of value
   let currentView = view(dispatch, model) // initail view set with initModel - yet can be reassigned
-  //causes side efefct of showing initial page load view
-  node.appendChild(currentView)
+
+  let rootNode = createElement(currentView)
+  //causes side effect of showing initial page load view
+  node.appendChild(rootNode)
 
 //handles the update sequence:
   function dispatch(msg) {
@@ -62,8 +72,19 @@ function app(initModel, update, view, node) {
     // reassigns model value to updated value
     const updatedView = view(dispatch, model)
     // creates updatedView with updated model value
-    node.replaceChild(updatedView, currentView)
+
+    const patches = diff(currentView, updatedView)
+    //determines changes between current view and updated VIEW
+
+    rootNode = patch(rootNode, patches)
+
+    // node.replaceChild(updatedView, currentView)
     // re-renders the view
+    // THIS IS INEFFICIENT AND EXPENSIVE - to continually destroy and recreate the DOM each time the value changes i.e. rerendering the entire view
+    //FIX: use a virtual DOM library - virtual DOM is a performance layer that sits between the view and the DOM
+    // new view is sent to the virtual DOM - it computes the minimum amount of chage required to render the view in the browsers dom
+    // only the specific changed DOM will be affected
+    // npm i virtual-dom --save-dev - saved as a dev dependancy
     currentView = updatedView
   }
 }

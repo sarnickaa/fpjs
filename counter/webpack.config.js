@@ -4,7 +4,7 @@ module.exports = {
   // compile that code into older versions (through babel) to older js code to make it compatible across browsers
   // output of compilation goes in bundle.js - this will also include all the libraries used
   // bundle.js gets pulled into the browser when webapp is built
-  entry: ['./src/index.js'],
+  entry: ['./src/index_clean.js'],
   devtool: 'inline-source-map',
   output: {
     filename: 'bundle.js',
