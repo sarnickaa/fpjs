@@ -3,7 +3,11 @@ import hh from 'hyperscript-helpers'
 import {
   h
 } from 'virtual-dom'
-import { showFormMsg } from './Update' //for named exports
+import {
+  showFormMsg,
+  mealInputMsg,
+  caloriesInputMsg
+} from './Update' //for named exports
 
 //destructuring to unpack the pre function form hh library
 //creates pre-tag for pre formatted text
@@ -33,7 +37,7 @@ function buttonSet(dispatch) {
   ])
 }
 
-function fieldSet(labelText, inputValue) {
+function fieldSet(labelText, inputValue, oninput) {
   //inputValue = the value to show in the text fieldSet
   return div([
     label({
@@ -43,7 +47,8 @@ function fieldSet(labelText, inputValue) {
     input({
       className: 'pa2 input-reset ba w-100 mb2',
       type: 'text',
-      value: inputValue
+      value: inputValue,
+      oninput
     })
   ])
 }
@@ -59,9 +64,15 @@ function formView(dispatch, model) {
     return form({
       className: 'w-100 mv2'
     }, [
-      fieldSet('Meal', description),
-      fieldSet('Calories', calories || ''),
+      fieldSet('Meal',
+        description,
+        e => dispatch(mealInputMsg(e.target.value))
+    ),
+      fieldSet('Calories',
+      calories || '',
       //if calories value is truthy i.e. 0 is falsey - will show empty string if falsey
+      e => dispatch(caloriesInputMsg(e.target.value))
+      ),
       buttonSet(dispatch)
     ])
   } else {
