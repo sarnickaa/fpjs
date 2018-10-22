@@ -6,7 +6,8 @@ import {
 import {
   showFormMsg,
   mealInputMsg,
-  caloriesInputMsg
+  caloriesInputMsg,
+  saveMealMsg
 } from './Update' //for named exports
 
 //destructuring to unpack the pre function form hh library
@@ -62,7 +63,11 @@ function formView(dispatch, model) {
 
   if (showForm) {
     return form({
-      className: 'w-100 mv2'
+      className: 'w-100 mv2',
+      onsubmit: e => {
+        e.preventDefault()
+        dispatch(saveMealMsg)
+      }
     }, [
       fieldSet('Meal',
         description,
