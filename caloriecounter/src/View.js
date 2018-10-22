@@ -8,7 +8,9 @@ import {
   showFormMsg,
   mealInputMsg,
   caloriesInputMsg,
-  saveMealMsg
+  saveMealMsg,
+  deleteMealMsg,
+  editMealMsg
 } from './Update' //for named exports
 // import { initModel } from './Model'
 
@@ -27,7 +29,8 @@ const {
   th,
   tbody,
   thead,
-  table
+  table,
+  i
 } = hh(h)
 
 function buttonSet(dispatch) {
@@ -116,7 +119,17 @@ function mealRow(dispatch, className, meal) {
   return tr({ className }, [
     cell(td, 'pa2', meal.description),
     cell(td, 'pa2 tr', meal.calories),
-    cell(td, 'pa2 tr', [])
+    cell(td, 'pa2 tr', [
+      //font awesome icons
+      i({
+        className: 'ph1 fa fa-trash-o pointer',
+        onclick: () => dispatch(deleteMealMsg(meal.id))
+      }),
+      i({
+        className: 'ph1 fa fa-pencil-square-o pointer',
+        onclick: () => dispatch(editMealMsg(meal.id))
+      })
+    ])
   ])
 }
 
@@ -162,7 +175,6 @@ function tableView(dispatch, meals) {
     mealsBody(dispatch, '', meals)
   ])
 }
-
 
 function view(dispatch, model) {
   return div({

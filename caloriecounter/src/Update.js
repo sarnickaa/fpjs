@@ -9,7 +9,9 @@ const MSGS = {
   SHOW_FORM: 'SHOW_FORM',
   MEAL_INPUT: 'MEAL_INPUT',
   CALORIES_INPUT: 'CALORIES_INPUT',
-  SAVE_MEAL: 'SAVE_MEAL'
+  SAVE_MEAL: 'SAVE_MEAL',
+  DELETE_MEAL: 'DELETE_MEAL',
+  EDIT_MEAL: 'EDIT_MEAL'
 }
 
 export function showFormMsg(showForm) {
@@ -37,6 +39,22 @@ export function caloriesInputMsg(calories) {
 
 export const  saveMealMsg = {
   type: MSGS.SAVE_MEAL
+}
+
+export function deleteMealMsg(id) {
+  return {
+    type: MSGS.DELETE_MEAL,
+    id
+    //message payload
+  }
+}
+
+export function editMealMsg(editId) {
+  return {
+    type: MSGS.EDIT_MEAL,
+    editId
+    //message payload
+  }
 }
 
 function update(msg, model) {
@@ -72,7 +90,47 @@ function update(msg, model) {
     }
 
     case MSGS.SAVE_MEAL: {
-      return add(msg, model)
+      //is app in edit or add mode? - check editId
+      const { editId } = model
+      const updatedModel = editId !== null ?
+        edit(msg, model) :
+        add(msg, model)
+      return updatedModel
+    }
+
+    case MSGS.DELETE_MEAL: {
+      const { id } = msg
+      const meals = R.filter(
+        meal => meal.id !== id,
+        //to remove a meal - have the predicate return a false value
+        model.meals
+      )
+      //RETURNS A NEW ARRAY WITH SPECIFIC FILTERED OUT
+      return {
+        ...model,
+        meals
+        //OVERRIDES the meals property from the original model with the new filtered meals
+      }
+    }
+
+    case MSGS.EDIT_MEAL: {
+      const { editId } = msg
+      //find the meal in the array that needs to be edited:
+      const meal = R.find(
+        meal => meal.id === editId,
+        //R.find takes a predicate function - if true - that object is returned
+        model.meals
+      )
+
+      const { description, calories } = meal
+
+      return {
+        ...model,
+        editId,
+        description,
+        calories,
+        showForm: true
+      }
     }
   }
   return model
@@ -93,6 +151,28 @@ function add(msg, model) {
     description: '',
     calories: 0,
     showForm: false
+  }
+}
+
+function edit(msg, model) {
+  const { description, calories, editId } = model
+  const meals = R.map(meal => {
+    if (meal.id === editId) {
+      return {
+        ...meal,
+        description,
+        calories
+      }
+    }
+    return meal
+  }, model.meals)
+  return {
+    ...model,
+    meals,
+    description: '',
+    calories: 0,
+    showForm: false,
+    editId: null
   }
 }
 
