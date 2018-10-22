@@ -3,12 +3,14 @@ import hh from 'hyperscript-helpers'
 import {
   h
 } from 'virtual-dom'
+import * as R from 'ramda'
 import {
   showFormMsg,
   mealInputMsg,
   caloriesInputMsg,
   saveMealMsg
 } from './Update' //for named exports
+// import { initModel } from './Model'
 
 //destructuring to unpack the pre function form hh library
 //creates pre-tag for pre formatted text
@@ -19,7 +21,13 @@ const {
   button,
   label,
   input,
-  form
+  form,
+  tr,
+  td,
+  th,
+  tbody,
+  thead,
+  table
 } = hh(h)
 
 function buttonSet(dispatch) {
@@ -89,6 +97,73 @@ function formView(dispatch, model) {
   }
 }
 
+
+// =============VIEW FUNCTIONS=============
+
+function cell(tag, className, value) {
+  return tag({className}, value)
+}
+
+const headerRow = tr([
+  cell(th, 'pa2 tl', 'Meal'),
+  cell(th, 'pa2 tr', 'Calorie'),
+  cell(th, 'pa2 tr', 'Other')
+])
+
+const tableHeader = thead(headerRow)
+
+function mealRow(dispatch, className, meal) {
+  return tr({ className }, [
+    cell(td, 'pa2', meal.description),
+    cell(td, 'pa2 tr', meal.calories),
+    cell(td, 'pa2 tr', [])
+  ])
+}
+
+function totalRow(meals) {
+  const total = R.pipe(
+    R.map(meal => meal.calories),
+    //transforms array of meal objects into array of numbers only (the calorie values)
+    R.sum
+    //sums up totals
+  )(meals)
+  return tr({ className: 'bt b' }, [
+    cell(td, 'pa2 tr', 'Total:'),
+    cell(td, 'pa2 tr', total),
+    cell(td, '', '')
+  ])
+}
+
+function mealsBody(dispatch, className, meals) {
+  const rows = R.map(
+    //transforms array of meals - into array of html rows
+    R.partial(mealRow, [dispatch, 'stripe-dark']),
+    //partially applying dispatch function and the css class to use
+    meals);
+
+  const rowsWithTotal = [...rows, totalRow(meals)]
+  return tbody({ className }, rowsWithTotal);
+}
+
+function mealsTable(meals){
+  return table({ className: 'mw5 center w-100 collapse' },
+              [
+                tableHeader,
+                mealsBody('', meals)
+              ])
+            }
+
+function tableView(dispatch, meals) {
+  if(meals.length === 0) {
+    return div({ className: 'mv2 i black-50' }, 'No meals to display')
+  }
+  return table({ className: 'mv2 w-100 collapse' }, [
+    tableHeader,
+    mealsBody(dispatch, '', meals)
+  ])
+}
+
+
 function view(dispatch, model) {
   return div({
       className: 'mw6 center'
@@ -101,6 +176,7 @@ function view(dispatch, model) {
         'Calorie Counter'
       ),
       formView(dispatch, model),
+      tableView(dispatch, model.meals),
       pre(JSON.stringify(model, null, 2))
       //turns JS object into a readable version of that value to display on screen
     ])
