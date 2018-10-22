@@ -1,14 +1,90 @@
 import hh from 'hyperscript-helpers'
 //hyperscript helper library
-import { h } from 'virtual-dom'
+import {
+  h
+} from 'virtual-dom'
 
 //destructuring to unpack the pre function form hh library
 //creates pre-tag for pre formatted text
-const { pre } = hh(h)
+const {
+  pre,
+  div,
+  h1,
+  button,
+  label,
+  input,
+  form
+} = hh(h)
+
+function buttonSet(dispatch) {
+  return div([
+    button({
+        className: 'f3 pv2 ph3 bg-blue white bn mr2 dim',
+        type: 'submit'
+      },
+      'Save'),
+    button({
+        className: 'f3 pv2 ph3 bg-light-gray dim',
+        type: 'button'
+      },
+      'Cancel')
+  ])
+}
+
+function fieldSet(labelText, inputValue) {
+  //inputValue = the value to show in the text fieldSet
+  return div([
+    label({
+        className: 'db mb1'
+      },
+      labelText),
+    input({
+      className: 'pa2 input-reset ba w-100 mb2',
+      type: 'text',
+      value: inputValue
+    })
+  ])
+}
+
+function formView(dispatch, model) {
+  const {
+    description,
+    calories,
+    showForm
+  } = model
+
+  if (showForm) {
+    return form({
+      className: 'w-100 mv2'
+    }, [
+      fieldSet('Meal', description),
+      fieldSet('Calories', calories || ''),
+      //if calories value is truthy i.e. 0 is falsey - will show empty string if falsey
+      buttonSet(dispatch)
+    ])
+  } else {
+    return button({
+        className: 'f3 pv2 ph3 bg-blue white bn'
+      },
+      'Add Meal')
+  }
+}
 
 function view(dispatch, model) {
-  return pre(JSON.stringify(model, null, 2))
-  //turns JS object into a readable version of that value to display on screen
+  return div({
+      className: 'mw6 center'
+    },
+    //array to contain div's children:
+    [
+      h1({
+          className: 'f2 pv2 bb'
+        },
+        'Calorie Counter'
+      ),
+      formView(dispatch, model),
+      pre(JSON.stringify(model, null, 2))
+      //turns JS object into a readable version of that value to display on screen
+    ])
 }
 
 export default view
