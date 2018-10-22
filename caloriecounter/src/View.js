@@ -1,8 +1,9 @@
 import hh from 'hyperscript-helpers'
-//hyperscript helper library
+//hyperscript helper library = defualt export syntax
 import {
   h
 } from 'virtual-dom'
+import { showFormMsg } from './Update' //for named exports
 
 //destructuring to unpack the pre function form hh library
 //creates pre-tag for pre formatted text
@@ -25,7 +26,8 @@ function buttonSet(dispatch) {
       'Save'),
     button({
         className: 'f3 pv2 ph3 bg-light-gray dim',
-        type: 'button'
+        type: 'button',
+        onclick: () => dispatch(showFormMsg(false))
       },
       'Cancel')
   ])
@@ -64,7 +66,8 @@ function formView(dispatch, model) {
     ])
   } else {
     return button({
-        className: 'f3 pv2 ph3 bg-blue white bn'
+        className: 'f3 pv2 ph3 bg-blue white bn',
+        onclick: () => dispatch(showFormMsg(true))
       },
       'Add Meal')
   }
