@@ -1,6 +1,8 @@
 import { diff, patch } from 'virtual-dom';
 import createElement from 'virtual-dom/create-element';
 
+
+//app function - the only function to allow side effects
 function app(initModel, update, view, node) {
   let model = initModel;
   let currentView = view(dispatch, model);
