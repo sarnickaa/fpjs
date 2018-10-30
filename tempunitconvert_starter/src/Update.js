@@ -53,11 +53,11 @@ function update (msg, model) {
       }
 
       const leftValueInt = toInt(leftValue)
-      return {
+      return convert({
         ...model,
         sourceLeft: true,
         leftValue: leftValueInt
-      }
+      })
     }
 
     case MSGS.RIGHT_VALUE_INPUT: {
@@ -72,32 +72,82 @@ function update (msg, model) {
       }
 
       const rightValueInt = toInt(rightValue)
-      return {
+      return convert({
         ...model,
         sourceLeft: false,
         rightValue: rightValueInt
-      }
+      })
     }
 
     case MSGS.LEFT_UNIT_INPUT: {
       const { leftUnit } = msg
-      return {
+      return convert({
         ...model,
         leftUnit
-      }
+      })
     }
 
     case MSGS.RIGHT_UNIT_INPUT: {
       const { rightUnit } = msg
-      return {
+      return convert({
         ...model,
         rightUnit
-      }
+      })
     }
 
 
   }
   return model;
+}
+
+function convert(model) {
+  const { leftValue, leftUnit, rightValue, rightUnit } = model
+
+  //if sourceLeft === true - then fromUnit = leftUnit and toUnit = rightUnit
+  const [fromUnit, fromTemp, toUnit] =
+  model.sourceLeft ?
+  [leftUnit, leftValue, rightUnit] :
+  [rightUnit, rightValue, leftUnit]
+
+  //conversion for otherValue
+  const otherValue = convertTemp(fromUnit, fromTemp, toUnit)
+
+  //return model with other value in place?
+  return model.sourceLeft ?
+  { ...model, rightValue: otherValue } :
+  {...model, leftValue: otherValue }
+}
+
+const CONVERSIONS = {
+  Celcius: {
+    Farenheit: function (temp) {
+      return 9 / 5 * temp + 32
+    },
+    Kelvin: function (temp) {
+      return temp + 273.15
+    }
+  },
+  Farenheit: {
+    Celcius: function (temp) {
+      return 5 / 9 * temp - 32
+    },
+    Kelvin: function (temp) {
+      return (temp - 32) * 5 / 9 + 273.15
+    }
+  },
+  Kelvin: {
+    Celcius: function (temp) {
+      return temp - 273.15
+    },
+    Farenheit: function (temp) {
+      return (temp - 273.15) * 9 / 5 + 32
+    }
+  }
+}
+
+function convertTemp(unitFrom, temp, unitTo) {
+  const action = CONVERSIONS[unitFrom][unitTo]
+  return action(temp)
 }
 
 export default update;

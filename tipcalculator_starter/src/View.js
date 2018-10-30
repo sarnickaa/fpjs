@@ -3,7 +3,8 @@ import hh from 'hyperscript-helpers';
 import { h } from 'virtual-dom';
 
 import {
-  billInputMsg
+  billInputMsg,
+  tipInputMsg
 } from './Update'
 
 const {
@@ -81,13 +82,17 @@ function totalsTable () {
 function view(dispatch, model) {
   return div({ className: 'mw6 center' }, [
     h1({ className: 'f2 pv2 bb' }, 'Tip Calculator'),
-    amountInput(dispatch, model.billAmount, 
+    amountInput(dispatch,                   model.billAmount, 
       'Bill Amount',
       //update model directly on input event:
       //use provided dispatch function (provided through App.js) to update model
       e => dispatch(billInputMsg(e.target.value))
       ),
-    amountInput(dispatch, model.tipAmount, 'Tip %'),
+    amountInput(dispatch, 
+      model.tipAmount,
+      'Tip %',
+      e => dispatch(tipInputMsg(e.target.value))
+      ),
     totalsTable(),
     pre(JSON.stringify(model, null, 2)),
   ]);

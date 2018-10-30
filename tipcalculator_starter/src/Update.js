@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 const MSGS = {
-  BILL_VALUE_INPUT: 'BILL_VALUE_INPUT'
+  BILL_VALUE_INPUT: 'BILL_VALUE_INPUT',
+  TIP_VALUE_INPUT: 'TIP_VALUE_INPUT'
 }
 
 const numberConvert =  R.pipe(parseInt, R.defaultTo(0))
@@ -16,6 +17,13 @@ export function billInputMsg (billValue) {
   }
 }
 
+export function tipInputMsg (tipValue) {
+  return {
+    type: MSGS.TIP_VALUE_INPUT,
+    tipValue
+  }
+}
+
 function update (msg, model) {
   // msg = the object returned from the inputMsg functions above
   switch (msg.type) {
@@ -23,11 +31,24 @@ function update (msg, model) {
     case MSGS.BILL_VALUE_INPUT: {
       const { billValue } = msg
 
+      //convert input to number
       const amount = numberConvert(billValue)
 
       return {
         ...model,
         billAmount: amount
+      }
+    }
+
+    case MSGS.TIP_VALUE_INPUT: {
+      const { tipValue } = msg
+
+      //convert input to number
+      const amount = numberConvert(tipValue)
+
+      return {
+        ...model,
+        tipAmount: amount
       }
     }
 
