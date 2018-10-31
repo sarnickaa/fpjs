@@ -1,10 +1,11 @@
 import * as R from 'ramda';
 const MSGS = {
   BILL_VALUE_INPUT: 'BILL_VALUE_INPUT',
-  TIP_VALUE_INPUT: 'TIP_VALUE_INPUT'
+  TIP_VALUE_INPUT: 'TIP_VALUE_INPUT',
 }
 
-const numberConvert =  R.pipe(parseInt, R.defaultTo(0))
+// const numberConvert =  R.pipe(parseFloat, R.defaultTo(0))
+
 //functional composition using Ramda:
 //numberConvert('string')
 //string is piped to the JS parseInt() function
@@ -24,6 +25,10 @@ export function tipInputMsg (tipValue) {
   }
 }
 
+// calculate tip and total amounts:
+
+
+
 function update (msg, model) {
   // msg = the object returned from the inputMsg functions above
   switch (msg.type) {
@@ -32,11 +37,11 @@ function update (msg, model) {
       const { billValue } = msg
 
       //convert input to number
-      const amount = numberConvert(billValue)
+      // const amount = numberConvert(billValue)
 
       return {
         ...model,
-        billAmount: amount
+        billAmount: billValue
       }
     }
 
@@ -44,13 +49,26 @@ function update (msg, model) {
       const { tipValue } = msg
 
       //convert input to number
-      const amount = numberConvert(tipValue)
+      // const amount = numberConvert(tipValue)
 
       return {
         ...model,
-        tipAmount: amount
+        tipAmount: tipValue
       }
     }
+
+
+    // case MSGS.TIP_AMOUNT_INPUT: {
+    //   const { tipTotal } = msg
+
+    //   //convert input to number
+    //   const amount = numberConvert(tipTotal)
+
+    //   return {
+    //     ...model,
+    //     tipTotal
+    //   }
+    // }
 
 
   }

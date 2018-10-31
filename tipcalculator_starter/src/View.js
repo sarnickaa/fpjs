@@ -4,8 +4,10 @@ import { h } from 'virtual-dom';
 
 import {
   billInputMsg,
-  tipInputMsg
+  tipInputMsg,
+  tipAmountMsg
 } from './Update'
+import initModel from './Model';
 
 const {
   div,
@@ -45,41 +47,60 @@ function cell(tag, className, value) {
   return tag({className}, value)
 }
 
-function totalRow() {
-  const total = 'this is the total bill'
-
+function totalRow(total) {
+  
   return tr({
     className: 'bt b'
   },
   [
     cell(td, 'pa2 tl', 'Total Bill:'),
-    cell(td, 'pa2 tr', total)
+    cell(td, 'pa2 tr', `$${total}`)
   ])
 }
 
-function tipRow() {
-  const tip = 'this is a tip'
+function tipRow(tip) {
 
   return tr({
     className: 'bt b'
   },
   [
     cell(td, 'pa2 tl', 'Tip Amount:'),
-    cell(td, 'pa2 tr', tip)
+    cell(td, 'pa2 tr', `$${tip}`)
   ])
 }
 
-function totalsTable () {
+function totalsTable (tip, total) {
   return table({
     className: 'w-100'
   }, [
-    tipRow(),
-    totalRow()
+    tipRow(tip),
+    totalRow(total)
   ])
+}
+
+function convToNum (tipInput, billInput) {
+  const tip = parseFloat(tipInput)
+  const bill = parseFloat(billInput)
+  return { tip, 
+           bill
+          }
 }
 
 
 function view(dispatch, model) {
+
+  const { tipAmount, billAmount } = model
+
+  //convert to numbers:
+  
+  const { tip, bill } = convToNum(tipAmount, billAmount)
+
+  const tipTotal = +((tip / 100) * bill).toFixed(2)
+  // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
+
+
+  const billTotal = +(tipTotal + bill).toFixed(2)
+
   return div({ className: 'mw6 center' }, [
     h1({ className: 'f2 pv2 bb' }, 'Tip Calculator'),
     amountInput(dispatch,                   model.billAmount, 
@@ -93,7 +114,7 @@ function view(dispatch, model) {
       'Tip %',
       e => dispatch(tipInputMsg(e.target.value))
       ),
-    totalsTable(),
+    totalsTable(tipTotal, billTotal),
     pre(JSON.stringify(model, null, 2)),
   ]);
 }
